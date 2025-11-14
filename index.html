@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR & Barcode Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    #reader { width: 300px; margin: auto; }
+    .btn { margin: 10px; padding: 10px 20px; font-size: 16px; }
+    #result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>QR & Barcode Scanner</h2>
+  <button class="btn" onclick="startScanner('qr')">Scan QR Code</button>
+  <button class="btn" onclick="startScanner('barcode')">Scan Barcode</button>
+  <div id="reader"></div>
+  <div id="result"></div>
+
+  <script>
+    let scanner;
+
+    function startScanner(type) {
+      document.getElementById("result").innerText = "";
+      if (scanner) {
+        scanner.clear().then(() => {
+          document.getElementById("reader").innerHTML = "";
+          initScanner(type);
+        });
+      } else {
+        initScanner(type);
+      }
+    }
+
+    function initScanner(type) {
+      scanner = new Html5Qrcode("reader");
+      const config = { fps: 10, qrbox: 250 };
+      const formats = type === 'qr'
+        ? [Html5QrcodeSupportedFormats.QR_CODE]
+        : [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.UPC_A];
+
+      scanner.start(
+        { facingMode: "environment" },
+        { ...config, formatsToSupport: formats },
+        (decodedText) => {
+          document.getElementById("result").innerText = `Scanned: ${decodedText}`;
+          scanner.stop();
+        },
+        (errorMessage) => {
+          // Optional: console.log(`Scan error: ${errorMessage}`);
+        }
+      );
+    }
+  </script>
+</body>
+</html>
